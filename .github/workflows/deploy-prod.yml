@@ -1,0 +1,45 @@
+name: deploy-prod
+on:
+  push:
+    branches:
+      - main
+      - release/*
+
+
+env:
+  USER: doxanocap
+  IMAGE: auth-api
+  TAG: prod
+
+jobs:
+  build:
+    runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.21"
+
+      - run: echo ${{ secrets.DOCKER_HUB_PASS}} | docker login -u $USER --password-stdin
+
+      - run: docker build -f dockerfile -t $USER/$IMAGE:$TAG .
+
+      - run: docker push $USER/$IMAGE:$TAG
+
+      - name: deploy
+        run: curl -f -k -X POST https://13.231.127.128:9443/api/webhooks/63fc0a04-6072-4820-b6df-cdcad95c267f
+
+# TODO
+#  deploy:
+#    needs: build
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      packages: write
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - run: sshpass -e ssh -o ConnectTimeout=5 -t ${{ secrets.HOST }} IMAGE=$IMAGE TAG docker compose -f $COMPOSE_FILE up -d
