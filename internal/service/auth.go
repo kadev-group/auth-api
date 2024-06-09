@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/doxanocap/pkg/ctxholder"
 	"github.com/doxanocap/pkg/errs"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
@@ -43,8 +42,8 @@ func (s *AuthService) NewSession(ctx context.Context, user *models.User) (result
 	if err = s.manager.Repository().Sessions().Create(ctx, &models.Session{
 		UserIDRef:    user.ID,
 		RefreshToken: tokens.RefreshToken,
-		IP:           ctxholder.GetStringByKey(ctx, "client_ip"),
-		StartedAt:    tools.GetPtr(startedAt),
+		//IP:           ctxholder.GetStringByKey(ctx, "client_ip"),
+		StartedAt: tools.GetPtr(startedAt),
 	}); err != nil {
 		return nil, err
 	}
@@ -73,8 +72,8 @@ func (s *AuthService) UpdateSession(ctx context.Context, user *models.User) (res
 	if err = s.manager.Repository().Sessions().UpdateByUserID(ctx, &models.Session{
 		UserIDRef:    user.ID,
 		RefreshToken: tokens.RefreshToken,
-		IP:           ctxholder.GetStringByKey(ctx, "client_ip"),
-		StartedAt:    tools.GetPtr(startedAt),
+		//IP:           ctxholder.GetStringByKey(ctx, "client_ip"),
+		StartedAt: tools.GetPtr(startedAt),
 	}); err != nil {
 		return nil, err
 	}

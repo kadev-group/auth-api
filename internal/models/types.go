@@ -1,14 +1,15 @@
 package models
 
 type (
-	OAuthProvider string
+	AuthProvider string
 )
 
 var (
-	DefaultOAuth OAuthProvider = "default"
-	GoogleOAuth  OAuthProvider = "google"
+	EmailAuth  AuthProvider = "email"
+	PhoneAuth  AuthProvider = "phone"
+	GoogleAuth AuthProvider = "google"
 )
 
-func (p OAuthProvider) IsValid() bool {
-	return p == GoogleOAuth
+func (p AuthProvider) IsValid() bool {
+	return p == GoogleAuth || p == EmailAuth || p == PhoneAuth
 }

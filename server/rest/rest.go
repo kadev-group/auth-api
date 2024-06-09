@@ -27,8 +27,9 @@ type REST struct {
 	service interfaces.IService
 
 	user        *controllers.UserController
-	auth        *controllers.AuthController
-	oAuth       *controllers.OAuthController
+	web         *controllers.WebController
+	mobile      *controllers.MobileController
+	session     *controllers.SessionController
 	middlewares *middlewares.Middlewares
 }
 
@@ -40,9 +41,10 @@ func InitREST(config *models.Config, service interfaces.IService, log *zap.Logge
 		service: service,
 		router:  router.InitGinRouter(config.ENV),
 
-		user:  controllers.InitUserController(config, service, m, log.Named("[USER]")),
-		auth:  controllers.InitAuthController(config, service, m, log.Named("[AUTH]")),
-		oAuth: controllers.InitOAuthController(config, service, m, log.Named("[OAUTH]")),
+		user:    controllers.InitUserController(config, service, m, log.Named("[USER]")),
+		web:     controllers.InitWebController(config, service, m, log.Named("[WEB]")),
+		mobile:  controllers.InitMobileController(config, service, m, log.Named("[MOBILE]")),
+		session: controllers.InitSessionController(config, service, m, log.Named("[SESSION]")),
 
 		middlewares: middlewares.InitMiddlewares(service, m, log.Named("[MIDDLEWARE]")),
 	}

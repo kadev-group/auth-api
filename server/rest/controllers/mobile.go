@@ -4,26 +4,25 @@ import (
 	"auth-api/internal/interfaces"
 	"auth-api/internal/models"
 	"auth-api/internal/pkg/metrics"
-	"auth-api/internal/pkg/tools"
 	"github.com/doxanocap/pkg/errs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
 )
 
-type UserController struct {
-	metrics *metrics.APIMetrics
+type MobileController struct {
 	log     *zap.Logger
 	config  *models.Config
+	metrics *metrics.APIMetrics
 	service interfaces.IService
 }
 
-func InitUserController(
+func InitMobileController(
 	config *models.Config,
 	service interfaces.IService,
 	metrics *metrics.APIMetrics,
-	log *zap.Logger) *UserController {
-	return &UserController{
+	log *zap.Logger) *MobileController {
+	return &MobileController{
 		log:     log,
 		config:  config,
 		metrics: metrics,
@@ -31,16 +30,21 @@ func InitUserController(
 	}
 }
 
-func (ctl *UserController) GetByUserIDCode(c *gin.Context) {
-	ctl.metrics.VerifyEmailRequests.Inc()
+func (ctl *MobileController) SignIn(c *gin.Context) {
+	ctl.metrics.SignInRequests.Inc()
 
-	userIDCode := c.Param("user_idcode")
-	if !tools.IsUUID(userIDCode) {
-		errs.SetGinError(c, models.HttpBadRequest)
+	var request models.MobileSignInReq
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errs.SetBothErrors(c, models.HttpBadRequest, err)
 		return
 	}
 
-	response, err := ctl.service.User().GetByUserIDCode(c, userIDCode)
+	if err := request.Validate(); err != nil {
+		errs.SetGinError(c, err)
+		return
+	}
+
+	response, err := ctl.service.User().Authenticate(c, request.ToAuthReq())
 	if err != nil {
 		errs.SetGinError(c, err)
 		return

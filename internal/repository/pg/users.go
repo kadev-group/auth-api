@@ -70,6 +70,18 @@ func (repo *UsersRepository) FindByEmail(ctx context.Context, email string) (use
 	return
 }
 
+func (repo *UsersRepository) FindByPhoneNumber(ctx context.Context, phoneNumber string) (user *models.User, err error) {
+	defer errs.WrapIfErr("repo.user.FindByPhone", &err)
+
+	user = &models.User{}
+	err = repo.db.GetContext(ctx, user,
+		`select * from users where phone_number = $1 and deleted_at is null`, phoneNumber)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	return
+}
+
 // FindWSessionByToken ...
 func (repo *UsersRepository) FindWSessionByToken(ctx context.Context, refreshToken string) (us *models.UserSession, err error) {
 	defer errs.WrapIfErr("repo.user.FindByToken", &err)

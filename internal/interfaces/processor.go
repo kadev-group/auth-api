@@ -10,6 +10,7 @@ import (
 type IProcessor interface {
 	Cache() ICacheProcessor
 	Queue() IQueueProcessor
+	SMS() ISMSProcessor
 }
 
 // Cache
@@ -49,4 +50,14 @@ type IQueueProducerProcessor interface {
 
 type IQueueProducerProvider interface {
 	Send(ctx context.Context, qName string, message []byte, args ...amqp.Table) (err error)
+}
+
+// SMS
+
+type ISMSProcessor interface {
+	Send(ctx context.Context, phone string, message string) error
+}
+
+type ISMSProvider interface {
+	Send(ctx context.Context, phone string, message string) error
 }

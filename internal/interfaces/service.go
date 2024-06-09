@@ -21,10 +21,10 @@ type IAuthService interface {
 
 type IUserService interface {
 	Create(ctx context.Context, userDTO *models.UserDTO) (*models.AuthResponse, error)
-	Authenticate(ctx context.Context, userDTO *models.UserDTO) (*models.AuthResponse, error)
+	Authenticate(ctx context.Context, req *models.AuthenticateReq) (*models.AuthResponse, error)
 	Refresh(ctx context.Context, refreshToken string) (*models.Tokens, error)
 	Logout(ctx context.Context, refreshToken string) (err error)
-	SendVerifyCode(ctx context.Context, email string) error
+	SendVerifyCode(ctx context.Context, request *models.SendVerifyCodeReq) error
 	GetByUserIDCode(ctx context.Context, userIDCode string) (*models.UserDTO, error)
 }
 

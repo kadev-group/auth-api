@@ -21,11 +21,7 @@ var (
 
 // custom errors for special cases
 var (
-	ErrInvalidOAuthState  = errs.NewHttp(http.StatusBadRequest, "invalid oauth state")
-	ErrInvalidRequest     = errs.NewHttp(http.StatusBadRequest, "invalid request params")
-	ErrInvalidEmail       = errs.NewHttp(http.StatusBadRequest, "invalid email")
-	ErrInvalidPassword    = errs.NewHttp(http.StatusBadRequest, "invalid password format")
-	ErrInvalidPhoneNumber = errs.NewHttp(http.StatusBadRequest, "invalid phone number")
+	ErrInvalidOAuthState = errs.NewHttp(http.StatusBadRequest, "invalid oauth state")
 
 	ErrInvalidToken      = errs.NewHttp(http.StatusUnauthorized, "invalid token")
 	ErrIncorrectPassword = errs.NewHttp(http.StatusUnauthorized, "incorrect password")
@@ -34,6 +30,7 @@ var (
 	ErrSessionNotFound = errs.NewHttp(http.StatusNotFound, "session not found")
 	ErrUserNotFound    = errs.NewHttp(http.StatusNotFound, "user not found")
 
+	ErrVerifyCodesLimit    = errs.NewHttp(http.StatusConflict, "verification codes limit")
 	ErrUserMustAuthWGoogle = errs.NewHttp(http.StatusConflict, "user must proceed with google")
 	ErrUserAlreadyExist    = errs.NewHttp(http.StatusConflict, "user already exist")
 	ErrSessionExpired      = errs.NewHttp(http.StatusConflict, "session is expired")

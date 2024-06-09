@@ -3,6 +3,7 @@ package middlewares
 import (
 	"auth-api/internal/interfaces"
 	"auth-api/internal/models"
+	"auth-api/internal/models/consts"
 	"auth-api/internal/pkg/metrics"
 	"github.com/doxanocap/pkg/ctxholder"
 	"github.com/doxanocap/pkg/errs"
@@ -96,6 +97,20 @@ func (m *Middlewares) ErrorHandler() gin.HandlerFunc {
 		m.metrics.SuccessfulHttpRequests.Inc()
 		log.Info("ok")
 	}
+}
+
+func (m *Middlewares) SetToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := ctxholder.GetRefreshToken(c)
+		c.SetCookie(consts.RefreshTokenKey,
+			token,
+			int(consts.RefreshTokenTTL),
+			"/",
+			"localhost",
+			false,
+			true)
+	}
+
 }
 
 func (m *Middlewares) getAuthToken(c *gin.Context) string {

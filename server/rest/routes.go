@@ -4,30 +4,48 @@ func (r *REST) InitRoutes() {
 	router := r.router
 	router.GET("/metrics", r.middlewares.GinMetricsHandler())
 	router.Use(r.middlewares.ErrorHandler())
+	m := r.middlewares
 
 	{
 		v1 := router.Group("/v1")
 		auth := v1.Group("/auth")
 		{
-
-			auth.POST("/sign-in", r.auth.SignIn)
-			auth.POST("/sign-up", r.auth.SignUp)
-			auth.PUT("/refresh", r.auth.Refresh)
-			auth.GET("/logout", r.auth.Logout)
-			auth.GET("/verify", r.auth.VerifySession)
-
-			google := auth.Group("/google")
+			session := auth.Group("/session")
 			{
-				google.GET("/call-back", r.oAuth.GoogleCallBack)
-				google.GET("/:state/redirect", r.oAuth.GoogleRedirect)
+				session.GET("/send-verify-code", r.session.SendVerifyCode)
+				session.GET("/verify", r.session.Verify)
+				session.PUT("/refresh", r.session.Refresh)
+				session.GET("/logout", r.session.Logout)
+			}
+
+			web := auth.Group("/web")
+			{
+				web.POST("/sign-in", r.web.SignIn, m.SetToken())
+				web.POST("/sign-up", r.web.SignUp, m.SetToken())
+
+				gmail := web.Group("/gmail")
+				{
+					gmail.GET("/call-back", r.web.GoogleCallBack)
+					gmail.GET("/:state/redirect", r.web.GoogleRedirect)
+				}
+			}
+
+			mobile := auth.Group("/mobile")
+			{
+				mobile.POST("/sign-in")
+
+				gmail := mobile.Group("/gmail")
+				{
+					gmail.POST("")
+					gmail.PUT("")
+				}
 			}
 
 			user := auth.Group("/user")
 			{
 				user.GET("/:user_idcode",
-					//r.middlewares.VerifySession,
+					m.VerifySession,
 					r.user.GetByUserIDCode)
-				user.GET("/send-verify-code", r.user.SendVerifyCode)
 			}
 		}
 	}

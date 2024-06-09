@@ -17,6 +17,7 @@ type IUserRepository interface {
 	Create(ctx context.Context, user *models.User) error
 	FindByID(ctx context.Context, id int64) (result *models.User, err error)
 	FindByEmail(ctx context.Context, email string) (result *models.User, err error)
+	FindByPhoneNumber(ctx context.Context, phoneNumber string) (user *models.User, err error)
 	FindByUserIDCode(ctx context.Context, userIDCode string) (user *models.User, err error)
 	FindWSessionByToken(ctx context.Context, refreshToken string) (*models.UserSession, error)
 }
@@ -43,7 +44,7 @@ type IGoogleAPICodesRepository interface {
 }
 
 type IVerificationCodesRepository interface {
-	Get(ctx context.Context, email string) (string, error)
-	Set(ctx context.Context, email, code string) error
-	Delete(ctx context.Context, email string) error
+	Get(ctx context.Context, key string) (*models.VerificationCode, error)
+	Set(ctx context.Context, key string, val *models.VerificationCode) error
+	Delete(ctx context.Context, key string) error
 }

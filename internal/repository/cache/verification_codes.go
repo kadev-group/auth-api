@@ -2,10 +2,12 @@ package cache
 
 import (
 	"auth-api/internal/interfaces"
+	"auth-api/internal/models"
 	"auth-api/internal/models/consts"
 	"context"
 	"fmt"
 	"github.com/doxanocap/pkg/errs"
+	"github.com/go-redis/redis/v8"
 	"time"
 )
 
@@ -21,20 +23,24 @@ func InitVerificationCodesRepository(cache interfaces.ICacheProcessor) *Verifica
 	}
 }
 
-func (c *VerificationCodesRepository) Get(ctx context.Context, email string) (string, error) {
-	key := c.constructKey(email)
+func (c *VerificationCodesRepository) Get(ctx context.Context, key string) (*models.VerificationCode, error) {
+	key = c.constructKey(key)
 
-	raw, err := c.cache.Get(ctx, key)
+	val := &models.VerificationCode{}
+	err := c.cache.GetJSON(ctx, key, val)
 	if err != nil {
-		return "", errs.Wrap("verification_codes.Get", err)
+		if err == redis.Nil {
+			return val, nil
+		}
+		return nil, errs.Wrap("verification_codes.Get", err)
 	}
-	return string(raw), nil
+	return val, nil
 }
 
-func (c *VerificationCodesRepository) Set(ctx context.Context, email, code string) error {
-	key := c.constructKey(email)
+func (c *VerificationCodesRepository) Set(ctx context.Context, key string, val *models.VerificationCode) error {
+	key = c.constructKey(key)
 
-	err := c.cache.Set(ctx, key, []byte(code))
+	err := c.cache.SetJSON(ctx, key, val)
 	if err != nil {
 		return errs.Wrap("verification_codes.Set", err)
 	}
@@ -42,8 +48,8 @@ func (c *VerificationCodesRepository) Set(ctx context.Context, email, code strin
 	return nil
 }
 
-func (c *VerificationCodesRepository) Delete(ctx context.Context, email string) error {
-	key := c.constructKey(email)
+func (c *VerificationCodesRepository) Delete(ctx context.Context, key string) error {
+	key = c.constructKey(key)
 
 	err := c.cache.Delete(ctx, key)
 	if err != nil {

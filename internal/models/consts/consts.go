@@ -6,9 +6,13 @@ import (
 
 // App constants
 const (
+	AppName = "Hitba"
+
 	EnvProd  = "prod"
 	EnvDev   = "dev"
 	EnvStage = "stage"
+
+	RefreshTokenKey = "refresh_token"
 
 	RefreshTokenTTL      = 30 * 24 * time.Hour
 	AccessTokenTTL       = 30 * time.Minute

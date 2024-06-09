@@ -96,9 +96,9 @@ func (g *GoogleAPI) HandleCallBack(ctx context.Context, state, exchangeCode stri
 	}
 	if user == nil {
 		tokens, err := g.manager.Service().User().Create(ctx, &models.UserDTO{
-			Email:         up.Email,
-			Activated:     true,
-			OAuthProvider: models.GoogleOAuth,
+			Email:        up.Email,
+			Activated:    true,
+			AuthProvider: models.GoogleAuth,
 		})
 		if err != nil {
 			return "", err

@@ -4,7 +4,7 @@ go 1.21.6
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/doxanocap/pkg v0.1.7
+	github.com/doxanocap/pkg v0.1.8
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v5 v5.0.0

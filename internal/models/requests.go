@@ -4,26 +4,54 @@ import (
 	"auth-api/internal/pkg/tools"
 )
 
-type SignInReq struct {
+type WebSignInReq struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
-func (r SignInReq) ToUserDTO() *UserDTO {
-	return &UserDTO{
-		Email:    r.Email,
-		Password: r.Password,
+func (r WebSignInReq) Validate() error {
+	if !tools.IsValidEmail(r.Email) ||
+		!tools.IsValidPassword(r.Password) {
+		return HttpBadRequest
+	}
+	return nil
+}
+
+func (r WebSignInReq) ToAuthReq() *AuthenticateReq {
+	return &AuthenticateReq{
+		Email:        r.Email,
+		Password:     r.Password,
+		AuthProvider: EmailAuth,
 	}
 }
 
-func (r SignInReq) Validate() error {
-	if !tools.IsValidEmail(r.Email) {
-		return ErrInvalidEmail
+type MobileSignInReq struct {
+	RequestID   string `json:"request_id"`
+	PhoneNumber string `json:"phone_number"`
+	VerifyCode  string `json:"verify_code"`
+}
+
+func (r *MobileSignInReq) Validate() error {
+	if r == nil ||
+		!tools.IsUUID(r.RequestID) ||
+		!tools.IsValidPhoneNumber(r.PhoneNumber) {
+		return HttpBadRequest
 	}
-	if !tools.IsValidPassword(r.Password) {
-		return ErrInvalidPassword
-	}
+
+	r.PhoneNumber = tools.NormalizePhone(r.PhoneNumber)
 	return nil
+}
+
+func (r *MobileSignInReq) ToAuthReq() *AuthenticateReq {
+	if r == nil {
+		return nil
+	}
+	return &AuthenticateReq{
+		PhoneNumber:  r.PhoneNumber,
+		RequestID:    r.RequestID,
+		VerifyCode:   r.VerifyCode,
+		AuthProvider: PhoneAuth,
+	}
 }
 
 type SignUpReq struct {
@@ -34,33 +62,47 @@ type SignUpReq struct {
 
 func (r SignUpReq) ToUserDTO() *UserDTO {
 	return &UserDTO{
-		Email:         r.Email,
-		Password:      r.Password,
-		PhoneNumber:   r.PhoneNumber,
-		OAuthProvider: DefaultOAuth,
+		Email:       r.Email,
+		Password:    r.Password,
+		PhoneNumber: r.PhoneNumber,
 	}
 }
 
 func (r SignUpReq) Validate() error {
-	if !tools.IsValidEmail(r.Email) {
-		return ErrInvalidEmail
-	}
-	if !tools.IsValidPassword(r.Password) {
-		return ErrInvalidPassword
-	}
-	if !tools.IsValidPhoneNumber(r.PhoneNumber) {
-		return ErrInvalidPhoneNumber
+	if !tools.IsValidEmail(r.Email) ||
+		!tools.IsValidPassword(r.Password) ||
+		!tools.IsValidPhoneNumber(r.PhoneNumber) {
+		return HttpBadRequest
 	}
 	return nil
 }
 
-type VerifyEmailReq struct {
+type SendVerifyCodeReq struct {
 	Email string `json:"email"`
+
+	RequestID   string `json:"request_id"`
+	PhoneNumber string `json:"phone_number"`
+
+	AuthProvider AuthProvider `json:"auth_provider"`
 }
 
-func (r VerifyEmailReq) Validate() error {
-	if !tools.IsValidEmail(r.Email) {
-		return ErrInvalidEmail
+func (r *SendVerifyCodeReq) Validate() error {
+	if r == nil {
+		return HttpBadRequest
 	}
-	return nil
+
+	if r.AuthProvider == PhoneAuth {
+		if !tools.IsUUID(r.RequestID) || !tools.IsValidPhoneNumber(r.PhoneNumber) {
+			return HttpBadRequest
+		}
+		r.PhoneNumber = tools.NormalizePhone(r.PhoneNumber)
+		return nil
+	} else if r.AuthProvider == EmailAuth {
+		if !tools.IsValidEmail(r.Email) {
+			return HttpBadRequest
+		}
+		return nil
+	} else {
+		return HttpBadRequest
+	}
 }
