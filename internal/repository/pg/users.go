@@ -25,11 +25,11 @@ func (repo *UsersRepository) Create(ctx context.Context, user *models.User) (err
 
 	err = repo.db.QueryRowxContext(ctx,
 		`insert into users
-		(user_idcode, email, phone_number, password, oauth_provider, created_at) 
-		values ($1,$2,$3,$4,$5, $6)
+		(user_idcode, email, phone_number, password, created_at) 
+		values ($1,$2,$3,$4,$5)
 		returning user_id`,
 		user.IDCode, user.Email, user.PhoneNumber,
-		user.Password, user.OAuthProvider, user.CreatedAt).
+		user.Password, user.CreatedAt).
 		Scan(&user.ID)
 	return
 }

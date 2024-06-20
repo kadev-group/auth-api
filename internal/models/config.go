@@ -1,15 +1,15 @@
 package models
 
 type Config struct {
-	ENV string `env:"APP_ENV"`
-
+	ENV        string `env:"APP_ENV"`
 	ServerPORT string `env:"SERVER_PORT"`
+	PsqlDsn    string `env:"PSQL_DSN"`
 
-	PSQL
-	Token
-	Redis
-	OAuth
-	RabbitMQ
+	Token    Token
+	SMSc     SMSc
+	Redis    Redis
+	OAuth    OAuth
+	RabbitMQ RabbitMQ
 }
 
 func (c Config) Env() string {
@@ -19,15 +19,6 @@ func (c Config) Env() string {
 type Token struct {
 	RefreshSecret string `env:"REFRESH_TOKEN_SECRET"`
 	AccessSecret  string `env:"ACCESS_TOKEN_SECRET"`
-}
-
-type PSQL struct {
-	PqHOST     string `env:"PSQL_HOST"`
-	PqPORT     string `env:"PSQL_PORT"`
-	PqUSER     string `env:"PSQL_USER"`
-	PqPASSWORD string `env:"PSQL_PASSWORD"`
-	PqDATABASE string `env:"PSQL_DATABASE"`
-	PqSSL      string `env:"PSQL_SSL"`
 }
 
 type Redis struct {
@@ -50,4 +41,9 @@ type GoogleAPI struct {
 type RabbitMQ struct {
 	ServerURL  string `env:"RABBITMQ_SERVER_URL"`
 	MailsQueue string `env:"RABBITMQ_MAILS_QUEUE"`
+}
+
+type SMSc struct {
+	Password string `env:"SMSC_PASSWORD"`
+	Login    string `env:"SMSC_LOGIN"`
 }

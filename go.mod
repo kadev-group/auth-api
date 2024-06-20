@@ -4,7 +4,7 @@ go 1.21.6
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/doxanocap/pkg v0.1.8
+	github.com/doxanocap/pkg v0.2.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v5 v5.0.0
@@ -14,7 +14,6 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/prometheus/client_golang v1.19.0
 	github.com/rabbitmq/amqp091-go v1.9.0
-	github.com/stretchr/testify v1.9.0
 	go.uber.org/fx v1.20.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.22.0
@@ -30,7 +29,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/cors v1.7.2 // indirect
@@ -57,7 +55,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.48.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect

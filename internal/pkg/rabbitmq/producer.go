@@ -3,7 +3,6 @@ package rabbitmq
 import (
 	"auth-api/internal/models"
 	"context"
-	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"go.uber.org/zap"
 )
@@ -16,18 +15,18 @@ type ProducerClient struct {
 func NewProducerClient(config *models.Config, log *zap.Logger) *ProducerClient {
 	log = log.Named("[RabbitMQ]")
 
-	conn, err := amqp.Dial(config.RabbitMQ.ServerURL)
-	if err != nil {
-		log.Fatal(fmt.Sprintf("connect: %s", err))
-	}
-
-	chanel, err := conn.Channel()
-	if err != nil {
-		log.Fatal(fmt.Sprintf("open channel: %s", err))
-	}
+	//conn, err := amqp.Dial(config.RabbitMQ.ServerURL)
+	//if err != nil {
+	//	log.Fatal(fmt.Sprintf("connect: %s", err))
+	//}
+	//
+	//chanel, err := conn.Channel()
+	//if err != nil {
+	//	log.Fatal(fmt.Sprintf("open channel: %s", err))
+	//}
 
 	return &ProducerClient{
-		chanel: chanel,
+		//chanel: chanel,
 		queues: map[string]amqp.Queue{},
 	}
 }

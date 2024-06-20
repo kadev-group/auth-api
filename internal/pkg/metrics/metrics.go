@@ -24,9 +24,9 @@ type APIMetrics struct {
 	VerifySessionRequest prometheus.Counter
 
 	// oauth
-
 	GoogleRedirectRequest prometheus.Counter
 	GoogleCallBackRequest prometheus.Counter
+	GmailAuthRequest      prometheus.Counter
 }
 
 // NewAPIMetrics creates a new instance of APIMetrics with Prometheus counters initialized.
@@ -81,6 +81,10 @@ func NewAPIMetrics() *APIMetrics {
 		GoogleCallBackRequest: prometheus.NewCounter(prometheus.CounterOpts{
 			Name: fmt.Sprintf("%s_google_callback_requests", serviceName),
 			Help: "The total number of Google callback http requests",
+		}),
+		GmailAuthRequest: prometheus.NewCounter(prometheus.CounterOpts{
+			Name: fmt.Sprintf("%s_gmail_auth_requests", serviceName),
+			Help: "The total number of Gmail Auth http requests",
 		}),
 	}
 }

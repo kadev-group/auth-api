@@ -1,6 +1,7 @@
 package smsc
 
 import (
+	"auth-api/internal/models"
 	"context"
 	"crypto/tls"
 	"encoding/json"
@@ -20,7 +21,7 @@ type SMSc struct {
 	reserveHost string
 }
 
-func NewSMSc(login, password string) *SMSc {
+func NewSMSc(config *models.Config) *SMSc {
 	return &SMSc{
 		http: &http.Client{
 			Timeout: 10 * time.Second,
@@ -30,8 +31,8 @@ func NewSMSc(login, password string) *SMSc {
 				},
 			},
 		},
-		login:       login,
-		password:    password,
+		login:       config.SMSc.Login,
+		password:    config.SMSc.Password,
 		host:        "smsc.kz",
 		reserveHost: "www2.smsc.kz",
 	}

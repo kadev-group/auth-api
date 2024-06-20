@@ -26,10 +26,11 @@ func InitSessionsRepository(db *sqlx.DB) *SessionsRepository {
 func (repo *SessionsRepository) Create(ctx context.Context, session *models.Session) error {
 	err := repo.db.QueryRowxContext(ctx, `
 		insert into sessions
-		(user_idref, refresh_token, session_ip, started_at) 
-		values ($1,$2,$3,$4)
+		(user_idref, refresh_token, session_ip, auth_provider, started_at) 
+		values ($1,$2,$3,$4, $5)
 		returning session_id`,
-		session.UserIDRef, session.RefreshToken, session.IP, session.StartedAt).
+		session.UserIDRef, session.RefreshToken, session.IP,
+		session.AuthProvider, session.StartedAt).
 		Scan(&session.ID)
 	if err != nil {
 		return errs.Wrap("repository.session.Create", err)

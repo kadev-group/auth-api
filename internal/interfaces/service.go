@@ -13,7 +13,7 @@ type IService interface {
 
 type IAuthService interface {
 	NewPairTokens(uSession *models.UserSession) (result *models.Tokens, err error)
-	NewSession(ctx context.Context, user *models.User) (result *models.Tokens, err error)
+	NewSession(ctx context.Context, provider models.AuthProvider, user *models.User) (result *models.Tokens, err error)
 	UpdateSession(ctx context.Context, user *models.User) (result *models.Tokens, err error)
 	ValidateRefreshToken(ctx context.Context, refreshToken string) (*models.UserSession, error)
 	ValidateAccessToken(ctx context.Context, accessToken string) (*models.UserSession, error)
@@ -24,15 +24,19 @@ type IUserService interface {
 	Authenticate(ctx context.Context, req *models.AuthenticateReq) (*models.AuthResponse, error)
 	Refresh(ctx context.Context, refreshToken string) (*models.Tokens, error)
 	Logout(ctx context.Context, refreshToken string) (err error)
-	SendVerifyCode(ctx context.Context, request *models.SendVerifyCodeReq) error
+	SendValidateCode(ctx context.Context, request *models.SendValidateCodeReq) error
 	GetByUserIDCode(ctx context.Context, userIDCode string) (*models.UserDTO, error)
+	SetValidateCode(ctx context.Context, phoneNumber, code string) error
 }
 
 type IOAuthService interface {
-	Google() IGoogleAPI
+	Gmail() IGmailService
 }
 
-type IGoogleAPI interface {
+type IGmailService interface {
 	GetRedirectURL(ctx context.Context, state string) (*models.GoogleRedirectRes, error)
 	HandleCallBack(ctx context.Context, code, exchangeCode string) (string, error)
+	GmailAuth(ctx context.Context, googleToken string) (res *models.GmailAuthRes, err error)
+	NewRequestSession(ctx context.Context, requestID, email string) error
+	ValidateRequestSession(ctx context.Context, requestID string) (string, error)
 }

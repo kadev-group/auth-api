@@ -36,7 +36,7 @@ func (mc *MailsProducer) Send(ctx context.Context, message *models.MailsProducer
 		return err
 	}
 
-	if err = mc.provider.Send(ctx, mc.config.MailsQueue, body); err != nil {
+	if err = mc.provider.Send(ctx, mc.config.RabbitMQ.MailsQueue, body); err != nil {
 		log.Error(err.Error())
 		return err
 	}

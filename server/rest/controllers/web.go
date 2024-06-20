@@ -6,6 +6,7 @@ import (
 	"auth-api/internal/pkg/metrics"
 	"auth-api/internal/pkg/tools"
 	"fmt"
+	"github.com/doxanocap/pkg/ctxholder"
 	"github.com/doxanocap/pkg/errs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -51,6 +52,7 @@ func (ctl *WebController) SignIn(c *gin.Context) {
 		return
 	}
 
+	ctxholder.SetClientIP(c)
 	response, err := ctl.service.User().Authenticate(c, request.ToAuthReq())
 	if err != nil {
 		errs.SetGinError(c, err)
@@ -74,8 +76,8 @@ func (ctl *WebController) SignUp(c *gin.Context) {
 		return
 	}
 
-	userDTO := request.ToUserDTO()
-	response, err := ctl.service.User().Create(c, userDTO)
+	ctxholder.SetClientIP(c)
+	response, err := ctl.service.User().Create(c, request.ToUserDTO())
 	if err != nil {
 		errs.SetGinError(c, err)
 		return
@@ -84,8 +86,8 @@ func (ctl *WebController) SignUp(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// GoogleRedirect ...
-func (ctl *WebController) GoogleRedirect(c *gin.Context) {
+// GmailAuthRedirect ...
+func (ctl *WebController) GmailAuthRedirect(c *gin.Context) {
 	ctl.metrics.GoogleRedirectRequest.Inc()
 	log := ctl.log.Named("GoogleRedirect")
 	state := c.Param("state")
@@ -94,7 +96,7 @@ func (ctl *WebController) GoogleRedirect(c *gin.Context) {
 		return
 	}
 
-	response, err := ctl.service.OAuth().Google().GetRedirectURL(c, state)
+	response, err := ctl.service.OAuth().Gmail().GetRedirectURL(c, state)
 	if err != nil {
 		errs.SetGinError(c, models.HttpBadRequest)
 		return
@@ -104,8 +106,8 @@ func (ctl *WebController) GoogleRedirect(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// GoogleCallBack ...
-func (ctl *WebController) GoogleCallBack(c *gin.Context) {
+// GmailAuthCallBack ...
+func (ctl *WebController) GmailAuthCallBack(c *gin.Context) {
 	ctl.metrics.GoogleCallBackRequest.Inc()
 	log := ctl.log.Named("GoogleCallBack")
 
@@ -123,13 +125,13 @@ func (ctl *WebController) GoogleCallBack(c *gin.Context) {
 	}
 
 	//ctxholder.SetKV(c, "client_ip", c.ClientIP())
-	accessToken, err := ctl.service.OAuth().Google().HandleCallBack(c, state, exchangeCode)
+	accessToken, err := ctl.service.OAuth().Gmail().HandleCallBack(c, state, exchangeCode)
 	if err != nil {
 		errs.SetGinError(c, err)
 		return
 	}
 
-	redirectURL, err := url.Parse(ctl.config.ClientCallBackURI)
+	redirectURL, err := url.Parse(ctl.config.OAuth.ClientCallBackURI)
 	if err != nil {
 		errs.SetBothErrors(c, models.HttpInternalServerError, err)
 		return

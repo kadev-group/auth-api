@@ -4,12 +4,14 @@ import (
 	"auth-api/internal/models"
 	"context"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"golang.org/x/oauth2"
 	"time"
 )
 
 type IProcessor interface {
 	Cache() ICacheProcessor
 	Queue() IQueueProcessor
+	APIs() IAPIsProcessor
 	SMS() ISMSProcessor
 }
 
@@ -18,6 +20,7 @@ type IProcessor interface {
 type ICacheProcessor interface {
 	Set(ctx context.Context, key string, value []byte) error
 	SetJSON(ctx context.Context, key string, value interface{}) error
+	SetWithTTL(ctx context.Context, key string, value []byte, ttl time.Duration) error
 	SetJSONWithTTL(ctx context.Context, key string, value interface{}, ttl time.Duration) error
 	Get(ctx context.Context, key string) ([]byte, error)
 	GetJSON(ctx context.Context, key string, v interface{}) error
@@ -60,4 +63,14 @@ type ISMSProcessor interface {
 
 type ISMSProvider interface {
 	Send(ctx context.Context, phone string, message string) error
+}
+
+type IAPIsProcessor interface {
+	GoogleAPI() IGoogleAPIProcessor
+}
+
+type IGoogleAPIProcessor interface {
+	GetUserProfileByToken(ctx context.Context, accessToken string) (*models.UserProfile, error)
+	NewRedirectURL(state string) (res *models.GoogleRedirectRes, err error)
+	Exchange(ctx context.Context, exchangeCode string) (token *oauth2.Token, err error)
 }

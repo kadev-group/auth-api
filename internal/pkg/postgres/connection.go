@@ -9,15 +9,13 @@ import (
 	"go.uber.org/zap"
 )
 
-func getDSN(cfg models.PSQL) string {
-	return fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		cfg.PqHOST, cfg.PqPORT, cfg.PqUSER, cfg.PqPASSWORD, cfg.PqDATABASE, cfg.PqSSL)
+func sslDisabled(config string) string {
+	return fmt.Sprintf("%s?sslmode=disable", config)
 }
 
 func InitConnection(config *models.Config, log *zap.Logger) *sqlx.DB {
 	log = log.Named("[PSQL]")
-	conn, err := sqlx.Connect("postgres", getDSN(config.PSQL))
+	conn, err := sqlx.Connect("postgres", sslDisabled(config.PsqlDsn))
 	if err != nil {
 		log.Fatal(fmt.Sprintf("connect: %s", err))
 	}

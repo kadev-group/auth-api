@@ -25,7 +25,6 @@ docker push doxanocap/auth-api:prod
 
 ```bash
 docker run --name infra_psql -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password12345 -e POSTGRES_DB=infra-psql -d postgres:14-alpine
-
 docker run --name=redis -p 6379:6379 --restart=always -d redis:latest
 
 docker run -d --hostname rabbit-mq --name rabbit-mq -p 15672:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password rabbitmq:3-management

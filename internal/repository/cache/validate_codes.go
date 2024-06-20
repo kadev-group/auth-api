@@ -5,31 +5,32 @@ import (
 	"auth-api/internal/models"
 	"auth-api/internal/models/consts"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/doxanocap/pkg/errs"
 	"github.com/go-redis/redis/v8"
 	"time"
 )
 
-type VerificationCodesRepository struct {
+type ValidateCodesRepository struct {
 	cache interfaces.ICacheProcessor
 	ttl   time.Duration
 }
 
-func InitVerificationCodesRepository(cache interfaces.ICacheProcessor) *VerificationCodesRepository {
-	return &VerificationCodesRepository{
+func InitValidateCodesRepository(cache interfaces.ICacheProcessor) *ValidateCodesRepository {
+	return &ValidateCodesRepository{
 		cache: cache,
-		ttl:   consts.VerificationCodesTTL,
+		ttl:   consts.ValidateCodesTTL,
 	}
 }
 
-func (c *VerificationCodesRepository) Get(ctx context.Context, key string) (*models.VerificationCode, error) {
+func (c *ValidateCodesRepository) Get(ctx context.Context, key string) (*models.VerificationCode, error) {
 	key = c.constructKey(key)
 
 	val := &models.VerificationCode{}
 	err := c.cache.GetJSON(ctx, key, val)
 	if err != nil {
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			return val, nil
 		}
 		return nil, errs.Wrap("verification_codes.Get", err)
@@ -37,10 +38,10 @@ func (c *VerificationCodesRepository) Get(ctx context.Context, key string) (*mod
 	return val, nil
 }
 
-func (c *VerificationCodesRepository) Set(ctx context.Context, key string, val *models.VerificationCode) error {
+func (c *ValidateCodesRepository) Set(ctx context.Context, key string, val *models.VerificationCode) error {
 	key = c.constructKey(key)
 
-	err := c.cache.SetJSON(ctx, key, val)
+	err := c.cache.SetJSONWithTTL(ctx, key, val, c.ttl)
 	if err != nil {
 		return errs.Wrap("verification_codes.Set", err)
 	}
@@ -48,7 +49,7 @@ func (c *VerificationCodesRepository) Set(ctx context.Context, key string, val *
 	return nil
 }
 
-func (c *VerificationCodesRepository) Delete(ctx context.Context, key string) error {
+func (c *ValidateCodesRepository) Delete(ctx context.Context, key string) error {
 	key = c.constructKey(key)
 
 	err := c.cache.Delete(ctx, key)
@@ -59,6 +60,6 @@ func (c *VerificationCodesRepository) Delete(ctx context.Context, key string) er
 	return nil
 }
 
-func (c *VerificationCodesRepository) constructKey(key string) string {
-	return fmt.Sprintf("%s:%s", consts.CacheVerifyCodePrefix, key)
+func (c *ValidateCodesRepository) constructKey(key string) string {
+	return fmt.Sprintf("%s.%s", consts.CacheVerifyCodePrefix, key)
 }

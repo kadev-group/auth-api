@@ -53,5 +53,5 @@ func (c *SessionCacheRepository) Set(ctx context.Context, userIDCode string, sta
 }
 
 func (c *SessionCacheRepository) constructKey(userIDCode string) string {
-	return fmt.Sprintf("%s:%s", consts.CacheSessionsPrefix, userIDCode)
+	return fmt.Sprintf("%s.%s", consts.CacheSessionsPrefix, userIDCode)
 }

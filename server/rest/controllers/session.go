@@ -6,6 +6,7 @@ import (
 	"auth-api/internal/models/consts"
 	"auth-api/internal/pkg/metrics"
 	"fmt"
+	"github.com/doxanocap/pkg/ctxholder"
 	"github.com/doxanocap/pkg/errs"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -42,6 +43,7 @@ func (ctl *SessionController) Refresh(c *gin.Context) {
 		return
 	}
 
+	ctxholder.SetClientIP(c)
 	response, err := ctl.service.User().Refresh(c, token)
 	if err != nil {
 		errs.SetGinError(c, err)
@@ -81,24 +83,24 @@ func (ctl *SessionController) Verify(c *gin.Context) {
 	userSession, err := ctl.service.Auth().ValidateAccessToken(c, token)
 	if err != nil {
 		httpError := errs.UnmarshalError(err)
-		code := httpError.StatusCode
 		log.Error(fmt.Sprintf("ValidateAccessToken: %s", err))
 
-		if code == http.StatusInternalServerError {
+		switch httpError.StatusCode {
+		case http.StatusInternalServerError:
 			c.Status(http.StatusUnauthorized)
-			return
+		default:
+			c.JSON(http.StatusUnauthorized, err)
 		}
-		c.JSON(http.StatusUnauthorized, err)
 		return
 	}
 
 	c.JSON(http.StatusOK, userSession)
 }
 
-func (ctl *SessionController) SendVerifyCode(c *gin.Context) {
+func (ctl *SessionController) SendValidateCode(c *gin.Context) {
 	ctl.metrics.VerifyEmailRequests.Inc()
 
-	var request models.SendVerifyCodeReq
+	var request models.SendValidateCodeReq
 	if err := c.ShouldBindJSON(&request); err != nil {
 		errs.SetBothErrors(c, models.HttpBadRequest, err)
 		return
@@ -109,7 +111,7 @@ func (ctl *SessionController) SendVerifyCode(c *gin.Context) {
 		return
 	}
 
-	err := ctl.service.User().SendVerifyCode(c, &request)
+	err := ctl.service.User().SendValidateCode(c, &request)
 	if err != nil {
 		errs.SetGinError(c, err)
 		return

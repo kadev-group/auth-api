@@ -4,7 +4,9 @@ import (
 	"auth-api/internal/interfaces"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/doxanocap/pkg/errs"
+	"github.com/go-redis/redis/v8"
 	"go.uber.org/zap"
 	"time"
 )
@@ -35,9 +37,9 @@ func (c *Cache) Set(ctx context.Context, key string, value []byte) error {
 }
 
 func (c *Cache) SetJSON(ctx context.Context, key string, value interface{}) error {
-	raw, err := json.Marshal(value)
-	log := c.log.With(zap.String("key", key), zap.String("value", string(raw)))
+	log := c.log.With(zap.String("key", key), zap.String("value", fmt.Sprintf("%v", value)))
 
+	raw, err := json.Marshal(value)
 	if err != nil {
 		log.Error(err.Error())
 		return errs.Wrap("marshal", err)
@@ -50,6 +52,22 @@ func (c *Cache) SetJSON(ctx context.Context, key string, value interface{}) erro
 	}
 
 	log.Info("setJSON")
+	return nil
+}
+
+func (c *Cache) SetWithTTL(ctx context.Context, key string, value []byte, ttl time.Duration) error {
+	log := c.log.With(
+		zap.String("key", key),
+		zap.String("value", string(value)),
+		zap.Duration("ttl", ttl))
+
+	err := c.provider.SetWithTTL(ctx, key, value, ttl)
+	if err != nil {
+		log.Error(err.Error())
+		return errs.Wrap("cache.processor.SetJSONWithTTL", err)
+	}
+
+	log.Info("SetWithTTL")
 	return nil
 }
 
@@ -95,6 +113,10 @@ func (c *Cache) GetJSON(ctx context.Context, key string, v interface{}) error {
 	if err != nil {
 		log.Error(err.Error())
 		return errs.Wrap("cache.processor.GetJSON", err)
+	}
+
+	if len(raw) == 0 || raw == nil {
+		return redis.Nil
 	}
 
 	err = json.Unmarshal(raw, v)

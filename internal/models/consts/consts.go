@@ -14,10 +14,10 @@ const (
 
 	RefreshTokenKey = "refresh_token"
 
-	RefreshTokenTTL      = 30 * 24 * time.Hour
-	AccessTokenTTL       = 30 * time.Minute
-	OAuthCodeTTl         = time.Minute
-	VerificationCodesTTL = 5 * time.Minute
+	RefreshTokenTTL   = 30 * 24 * time.Hour
+	AccessTokenTTL    = 30 * time.Minute
+	RequestSessionTTl = 5 * time.Minute
+	ValidateCodesTTL  = 5 * time.Minute
 
 	AuthHashCost = 10
 
@@ -25,9 +25,10 @@ const (
 	GoogleScopeEmail       = "https://www.googleapis.com/auth/userinfo.email"
 	GoogleScopeUserProfile = "https://www.googleapis.com/auth/userinfo.profile"
 
-	CacheSessionsPrefix    = "ses"
-	CacheGoogleOAuthPrefix = "oauth2"
-	CacheVerifyCodePrefix  = "verify"
+	CacheRequestSessionsPrefix = "req.ses"
+	CacheSessionsPrefix        = "ses"
+	CacheGoogleOAuthPrefix     = "oauth2"
+	CacheVerifyCodePrefix      = "verify"
 
 	DateFormat        = "2006-01-02"
 	EmailRegexp       = `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`

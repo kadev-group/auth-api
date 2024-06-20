@@ -10,7 +10,7 @@ type OAuthService struct {
 	config  *models.Config
 	manager interfaces.IManager
 
-	google interfaces.IGoogleAPI
+	gmail interfaces.IGmailService
 }
 
 func InitOAuthService(manager interfaces.IManager, config *models.Config) *OAuthService {
@@ -18,10 +18,10 @@ func InitOAuthService(manager interfaces.IManager, config *models.Config) *OAuth
 		config:  config,
 		manager: manager,
 
-		google: oauth.InitGoogleAPI(manager, config),
+		gmail: oauth.InitGmailService(manager, config),
 	}
 }
 
-func (s *OAuthService) Google() interfaces.IGoogleAPI {
-	return s.google
+func (s *OAuthService) Gmail() interfaces.IGmailService {
+	return s.gmail
 }

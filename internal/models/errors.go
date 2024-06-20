@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/doxanocap/pkg/errs"
@@ -21,7 +22,8 @@ var (
 
 // custom errors for special cases
 var (
-	ErrInvalidOAuthState = errs.NewHttp(http.StatusBadRequest, "invalid oauth state")
+	ErrInvalidAuthState    = errs.NewHttp(http.StatusBadRequest, "invalid auth state")
+	ErrInvalidAuthProvider = errs.NewHttp(http.StatusBadRequest, "invalid auth provider")
 
 	ErrInvalidToken      = errs.NewHttp(http.StatusUnauthorized, "invalid token")
 	ErrIncorrectPassword = errs.NewHttp(http.StatusUnauthorized, "incorrect password")
@@ -30,11 +32,42 @@ var (
 	ErrSessionNotFound = errs.NewHttp(http.StatusNotFound, "session not found")
 	ErrUserNotFound    = errs.NewHttp(http.StatusNotFound, "user not found")
 
-	ErrVerifyCodesLimit    = errs.NewHttp(http.StatusConflict, "verification codes limit")
-	ErrUserMustAuthWGoogle = errs.NewHttp(http.StatusConflict, "user must proceed with google")
-	ErrUserAlreadyExist    = errs.NewHttp(http.StatusConflict, "user already exist")
-	ErrSessionExpired      = errs.NewHttp(http.StatusConflict, "session is expired")
-	ErrStateCollision      = errs.NewHttp(http.StatusConflict, "such oauth state already exist")
+	ErrValidateCodesLimit    = errs.NewHttp(http.StatusConflict, "verification codes limit")
+	ErrIncorrectValidateCode = errs.NewHttp(http.StatusConflict, "incorrect validate code")
 
-	ErrInvalidOAuthProvider = errs.New("invalid oauth provider")
+	ErrUserMustAuthWGoogle   = errs.NewHttp(http.StatusConflict, "user must proceed with google")
+	ErrUserAlreadyExist      = errs.NewHttp(http.StatusConflict, "user already exist")
+	ErrSessionExpired        = errs.NewHttp(http.StatusConflict, "session is expired")
+	ErrInvalidState          = errs.NewHttp(http.StatusConflict, "invalid state")
+	ErrInvalidRequestSession = errs.NewHttp(http.StatusConflict, "invalid request session")
+
+	ErrInactiveUser = errs.NewHttp(http.StatusUnprocessableEntity, "user is inactive")
 )
+
+func ErrGmailAlreadyRegistered(gmail string) error {
+	idx := len(gmail) - 1
+	for i := idx; i >= 0; i-- {
+		if gmail[i] == '@' {
+			idx = i - 1
+			break
+		}
+	}
+	if idx == 0 {
+		return errs.NewHttp(http.StatusInternalServerError, "invalid gmail")
+	}
+
+	hiddenGmail := []rune(gmail)
+
+	if idx >= 8 {
+		for i := idx; i > 5; i-- {
+			hiddenGmail[i] = '*'
+		}
+	} else {
+		for i := idx; i > idx/2; i-- {
+			hiddenGmail[i] = '*'
+		}
+	}
+
+	msg := fmt.Sprintf("Ваш номер зарегестрирован по адресу %s", string(hiddenGmail))
+	return errs.NewHttp(http.StatusConflict, msg)
+}

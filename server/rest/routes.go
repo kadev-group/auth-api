@@ -12,7 +12,7 @@ func (r *REST) InitRoutes() {
 		{
 			session := auth.Group("/session")
 			{
-				session.GET("/send-verify-code", r.session.SendVerifyCode)
+				session.GET("/send-validate-code", r.session.SendValidateCode)
 				session.GET("/verify", r.session.Verify)
 				session.PUT("/refresh", r.session.Refresh)
 				session.GET("/logout", r.session.Logout)
@@ -25,19 +25,19 @@ func (r *REST) InitRoutes() {
 
 				gmail := web.Group("/gmail")
 				{
-					gmail.GET("/call-back", r.web.GoogleCallBack)
-					gmail.GET("/:state/redirect", r.web.GoogleRedirect)
+					gmail.GET("/call-back", r.web.GmailAuthCallBack)
+					gmail.GET("/:state/redirect", r.web.GmailAuthRedirect)
 				}
 			}
 
 			mobile := auth.Group("/mobile")
 			{
-				mobile.POST("/sign-in")
+				mobile.POST("/sign-in", r.mobile.SignIn)
 
 				gmail := mobile.Group("/gmail")
 				{
-					gmail.POST("")
-					gmail.PUT("")
+					gmail.POST("", r.mobile.GmailAuth)
+					gmail.PUT("", r.mobile.SetGmail)
 				}
 			}
 

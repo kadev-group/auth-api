@@ -6,6 +6,7 @@ import (
 	"auth-api/internal/pkg/postgres"
 	"auth-api/internal/pkg/rabbitmq"
 	"auth-api/internal/pkg/redis"
+	"auth-api/internal/pkg/smsc"
 	"github.com/doxanocap/pkg/config"
 	"github.com/doxanocap/pkg/logger"
 	"go.uber.org/fx"
@@ -18,6 +19,7 @@ func main() {
 			config.InitConfig[models.Config],
 			logger.InitLogger[models.Config],
 			rabbitmq.NewProducerClient,
+			smsc.NewSMSc,
 			postgres.InitConnection,
 			redis.InitConnection,
 			manager.InitManager,

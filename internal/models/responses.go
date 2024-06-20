@@ -8,3 +8,11 @@ type AuthResponse struct {
 type GoogleRedirectRes struct {
 	RedirectURL string `json:"redirect_url"`
 }
+
+type GmailAuthRes struct {
+	NewUser bool `json:"new_user"`
+	Data    struct {
+		Tokens
+		RequestID string `json:"request_id,omitempty"`
+	} `json:"data"`
+}

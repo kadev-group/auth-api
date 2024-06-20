@@ -26,9 +26,9 @@ func (r WebSignInReq) ToAuthReq() *AuthenticateReq {
 }
 
 type MobileSignInReq struct {
-	RequestID   string `json:"request_id"`
-	PhoneNumber string `json:"phone_number"`
-	VerifyCode  string `json:"verify_code"`
+	RequestID    string `json:"request_id"`
+	PhoneNumber  string `json:"phone_number"`
+	ValidateCode string `json:"validate_code"`
 }
 
 func (r *MobileSignInReq) Validate() error {
@@ -49,9 +49,13 @@ func (r *MobileSignInReq) ToAuthReq() *AuthenticateReq {
 	return &AuthenticateReq{
 		PhoneNumber:  r.PhoneNumber,
 		RequestID:    r.RequestID,
-		VerifyCode:   r.VerifyCode,
+		ValidateCode: r.ValidateCode,
 		AuthProvider: PhoneAuth,
 	}
+}
+
+type MobileGmailAuthReq struct {
+	GoogleToken string `json:"google_access_token"`
 }
 
 type SignUpReq struct {
@@ -62,9 +66,10 @@ type SignUpReq struct {
 
 func (r SignUpReq) ToUserDTO() *UserDTO {
 	return &UserDTO{
-		Email:       r.Email,
-		Password:    r.Password,
-		PhoneNumber: r.PhoneNumber,
+		Email:        r.Email,
+		Password:     r.Password,
+		PhoneNumber:  r.PhoneNumber,
+		AuthProvider: EmailAuth,
 	}
 }
 
@@ -77,7 +82,7 @@ func (r SignUpReq) Validate() error {
 	return nil
 }
 
-type SendVerifyCodeReq struct {
+type SendValidateCodeReq struct {
 	Email string `json:"email"`
 
 	RequestID   string `json:"request_id"`
@@ -86,7 +91,7 @@ type SendVerifyCodeReq struct {
 	AuthProvider AuthProvider `json:"auth_provider"`
 }
 
-func (r *SendVerifyCodeReq) Validate() error {
+func (r *SendValidateCodeReq) Validate() error {
 	if r == nil {
 		return HttpBadRequest
 	}

@@ -8,7 +8,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/doxanocap/pkg/ctxholder"
 	"github.com/doxanocap/pkg/errs"
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
@@ -25,7 +27,10 @@ func InitAuthService(manager interfaces.IManager, config *models.Config) *AuthSe
 	}
 }
 
-func (s *AuthService) NewSession(ctx context.Context, user *models.User) (result *models.Tokens, err error) {
+func (s *AuthService) NewSession(
+	ctx context.Context,
+	provider models.AuthProvider,
+	user *models.User) (result *models.Tokens, err error) {
 	startedAt := time.Now().Unix()
 	userSession := &models.UserSession{
 		UserIDCode:    user.IDCode,
@@ -41,9 +46,10 @@ func (s *AuthService) NewSession(ctx context.Context, user *models.User) (result
 
 	if err = s.manager.Repository().Sessions().Create(ctx, &models.Session{
 		UserIDRef:    user.ID,
+		AuthProvider: provider,
+		IP:           s.getClientIP(ctx),
 		RefreshToken: tokens.RefreshToken,
-		//IP:           ctxholder.GetStringByKey(ctx, "client_ip"),
-		StartedAt: tools.GetPtr(startedAt),
+		StartedAt:    tools.GetPtr(startedAt),
 	}); err != nil {
 		return nil, err
 	}
@@ -72,8 +78,8 @@ func (s *AuthService) UpdateSession(ctx context.Context, user *models.User) (res
 	if err = s.manager.Repository().Sessions().UpdateByUserID(ctx, &models.Session{
 		UserIDRef:    user.ID,
 		RefreshToken: tokens.RefreshToken,
-		//IP:           ctxholder.GetStringByKey(ctx, "client_ip"),
-		StartedAt: tools.GetPtr(startedAt),
+		IP:           s.getClientIP(ctx),
+		StartedAt:    tools.GetPtr(startedAt),
 	}); err != nil {
 		return nil, err
 	}
@@ -171,4 +177,12 @@ func (s *AuthService) ValidateAccessToken(ctx context.Context, accessToken strin
 	}
 
 	return &userSession, nil
+}
+
+func (s *AuthService) getClientIP(ctx context.Context) (clientIP string) {
+	c, ok := ctx.(*gin.Context)
+	if ok {
+		clientIP = ctxholder.GetClientIP(c)
+	}
+	return
 }
