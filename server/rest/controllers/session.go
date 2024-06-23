@@ -50,6 +50,7 @@ func (ctl *SessionController) Refresh(c *gin.Context) {
 		return
 	}
 
+	ctxholder.SetRefreshToken(c, response.RefreshToken, 0)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -67,6 +68,7 @@ func (ctl *SessionController) Logout(c *gin.Context) {
 		return
 	}
 
+	ctxholder.SetRefreshToken(c, "", -1)
 	c.Status(http.StatusOK)
 }
 

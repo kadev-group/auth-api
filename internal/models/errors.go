@@ -26,6 +26,7 @@ var (
 	ErrInvalidAuthProvider = errs.NewHttp(http.StatusBadRequest, "invalid auth provider")
 
 	ErrInvalidToken      = errs.NewHttp(http.StatusUnauthorized, "invalid token")
+	ErrSessionExpired    = errs.NewHttp(http.StatusUnauthorized, "session is expired")
 	ErrIncorrectPassword = errs.NewHttp(http.StatusUnauthorized, "incorrect password")
 
 	ErrStateNotFound   = errs.NewHttp(http.StatusNotFound, "state not found")
@@ -37,7 +38,6 @@ var (
 
 	ErrUserMustAuthWGoogle   = errs.NewHttp(http.StatusConflict, "user must proceed with google")
 	ErrUserAlreadyExist      = errs.NewHttp(http.StatusConflict, "user already exist")
-	ErrSessionExpired        = errs.NewHttp(http.StatusConflict, "session is expired")
 	ErrInvalidState          = errs.NewHttp(http.StatusConflict, "invalid state")
 	ErrInvalidRequestSession = errs.NewHttp(http.StatusConflict, "invalid request session")
 
@@ -68,6 +68,6 @@ func ErrGmailAlreadyRegistered(gmail string) error {
 		}
 	}
 
-	msg := fmt.Sprintf("Ваш номер зарегестрирован по адресу %s", string(hiddenGmail))
+	msg := fmt.Sprintf("Ваш номер зарегистрирован по адресу %s", string(hiddenGmail))
 	return errs.NewHttp(http.StatusConflict, msg)
 }

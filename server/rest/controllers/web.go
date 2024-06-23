@@ -59,6 +59,7 @@ func (ctl *WebController) SignIn(c *gin.Context) {
 		return
 	}
 
+	ctxholder.SetRefreshToken(c, response.Tokens.RefreshToken, 0)
 	c.JSON(http.StatusOK, response)
 }
 
@@ -83,6 +84,7 @@ func (ctl *WebController) SignUp(c *gin.Context) {
 		return
 	}
 
+	ctxholder.SetRefreshToken(c, response.Tokens.RefreshToken, 0)
 	c.JSON(http.StatusOK, response)
 }
 

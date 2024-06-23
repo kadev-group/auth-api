@@ -14,7 +14,7 @@ func (r *REST) InitRoutes() {
 			{
 				session.GET("/send-validate-code", r.session.SendValidateCode)
 				session.GET("/verify", r.session.Verify)
-				session.PUT("/refresh", r.session.Refresh)
+				session.PUT("/refresh", r.session.Refresh, m.SetToken())
 				session.GET("/logout", r.session.Logout)
 			}
 
